@@ -1,32 +1,48 @@
-1. https://leetcode-cn.com/problems/zi-fu-chuan-de-pai-lie-lcof/
+1. https://leetcode-cn.com/problems/ju-zhen-zhong-de-lu-jing-lcof/
 
 ```go
-func permutation(s string) (ans []string) {
-    t := []byte(s)
-    sort.Slice(t, func(i, j int) bool { return t[i] < t[j] })
-    n := len(t)
-    perm := make([]byte, 0, n)
-    vis := make([]bool, n)
-    var backtrack func(int)
-    backtrack = func(i int) {
-        if i == n {
-            ans = append(ans, string(perm))
-            return
-        }
-        for j, b := range vis {
-            if b || j > 0 && !vis[j-1] && t[j-1] == t[j] {
-                continue
-            }
-            vis[j] = true
-            perm = append(perm, t[j])
-            backtrack(i + 1)
-            perm = perm[:len(perm)-1]
-            vis[j] = false
+func exist(board [][]byte, word string) bool {
+   m,n := len(board), len(board[0])
+   for i := 0; i < m; i++ {
+       for j := 0; j < n; j++ {
+         //如果在数组中找得到第一个数，就执行下一步，否则返回false
+         if search(board, i, j, 0,word) {
+             return true
+             }
         }
     }
-    backtrack(0)
-    return
+    return false   
 }
+func search(board [][]byte, i,j,k int, word string) bool {
+    //如果找到最后一个数，则返回true,搜索成功
+    if k == len(word) {
+        return true
+    }
+    //i,j的约束条件
+    if i < 0 || j < 0 || i == len(board) || j == len(board[0]) {
+        return false
+    }
 
+    //进入DFS深度优先搜索
+    //先把正在遍历的该值重新赋值，如果在该值的周围都搜索不到目标字符，则再把该值还原
+        //如果在数组中找到第一个字符，则进入下一个字符的查找
+    if board[i][j] == word[k] {
+        temp := board[i][j]
+        board[i][j] = ' '
+        //下面这个if语句，如果成功进入，说明找到该字符，然后进行下一个字符的搜索,直到所有的搜索都成功，
+        //即k == len(word) - 1 的大小时，会返回true，进入该条件语句，然后返回函数true值。
+        if search(board, i, j + 1, k + 1, word) || 
+        search(board, i, j - 1, k + 1, word) || 
+        search(board, i + 1, j, k + 1, word) ||
+        search(board, i - 1, j, k + 1, word)  {
+            return true
+        }else {
+        //没有找到目标字符，还原之前重新赋值的board[i][j]
+            board[i][j] = temp
+        }
+        }
 
+  
+    return false
+}
 ```
